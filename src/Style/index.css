@@ -1,0 +1,109 @@
+/* tailwind css */
+@import "tailwindcss";
+@plugin "daisyui";
+
+@theme {
+  --color-white: #ffffff;
+  --color-black: #000000;
+  --color-brandlightgray: #ededed;
+  --color-brandsoftgray: #979292;
+  --color-brandsuccess: #78bb7b;
+  --color-brandalert: #c64141;
+  --color-brandsoftlavender: #d2d7ee;
+  --color-brandiceblue: #e6ecf9;
+  --color-brandmistblue: #d5dceb;
+  --color-brandbabyblue: #c6d8f5;
+  --color-brandmediumblue: #8aa8f1;
+  --color-brandprimary: #013cc6;
+  --color-brandsteel: #727d9f;
+  --color-branddeepblue: #1e396d;
+}
+
+body {
+  font-family: "Poppins", sans-serif;
+  margin: 0;
+  padding: 0;
+
+  background-color: #ffffff;
+  color: #000000;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+@layer utilities {
+  /* Responsividade Página Resenhas */
+
+  @media (max-width: 685px) {
+    .custom-subtitle-685px {
+      font-size: 15px;
+    }
+  }
+
+  @media (max-width: 635px) {
+    .custom-subtitle-635px {
+      font-size: 20px;
+    }
+
+    .custom-buttonEdit-635px {
+      width: 24px;
+      height: 24px;
+    }
+
+    .custom-h2-635px {
+      font-size: 13px;
+    }
+
+    .custom-status-635px {
+      font-size: 15px;
+    }
+  }
+
+  @media (max-width: 525px) {
+    .custom-subtitle-525px {
+      font-size: 17px;
+    }
+
+    .custom-buttonEdit-525px {
+      width: 20px;
+      height: 20px;
+    }
+
+    .custom-h2-525px {
+      font-size: 12px;
+    }
+
+    .custom-status-525px {
+      font-size: 14px;
+    }
+  }
+
+  @media (max-width: 462px) {
+    .custom-subtitle-462px {
+      font-size: 14px;
+    }
+
+    .custom-buttonEdit-462px {
+      width: 18px;
+      height: 18px;
+    }
+
+    .custom-h2-462px {
+      font-size: 10px;
+    }
+
+    .custom-status-462px {
+      font-size: 13px;
+    }
+
+    .custom-div-462px {
+      display: flex;
+      flex-direction: column-reverse;
+    }
+  }
+}
