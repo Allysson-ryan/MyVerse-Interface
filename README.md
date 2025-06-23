@@ -1,6 +1,6 @@
 # 🎨 MyVerse Interface – Frontend
 
-Interface web da aplicação **MyVerse**, uma plataforma pessoal para acompanhar resenhas de livros, filmes e séries, e também organizar itens que o usuário deseja consumir. Esta aplicação se conecta à [MyVerse API](https://github.com/seu-usuario/api-myverse) para fornecer uma experiência completa e integrada.
+Interface web da aplicação **MyVerse**, uma plataforma pessoal para acompanhar resenhas de livros, filmes e séries, e também organizar itens que o usuário deseja consumir. Esta aplicação se conecta à [MyVerse API]([https://github.com/seu-usuario/api-myverse](https://github.com/Allysson-ryan/MyVerse-Api)) para fornecer uma experiência completa e integrada.
 
 ---
 
