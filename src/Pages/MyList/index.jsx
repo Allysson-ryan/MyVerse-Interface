@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect, useCallback } from "react";
-import { Table, Checkbox } from "@mantine/core";
+import { Table } from "@mantine/core";
 import {
   MagnifyingGlass,
   NotePencil,
@@ -27,10 +27,10 @@ import {
   Snackbar,
 } from "@mui/material";
 import { FunnelSimpleXIcon, TrashIcon } from "@phosphor-icons/react";
+import { getToken } from "../../utils/authStorage";
 
 export default function MyList() {
   const [searchText, setSearchText] = useState("");
-  const [selection, setSelection] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("");
   const [opened, { open, close }] = useDisclosure(false);
   const [errors, setErrors] = useState({});
@@ -39,6 +39,9 @@ export default function MyList() {
   const [activePopoverId, setActivePopoverId] = useState(null);
   const [openDialog, setOpenDialog] = useState(false);
   const [wishlistData, setWishlistData] = useState([]);
+  const token = getToken();
+  const [isReady, setIsReady] = useState(false);
+  const [popoverPosition, setPopoverPosition] = useState({ top: 0, left: 0 });
 
   const [snackbar, setSnackbar] = useState({
     open: false,
@@ -100,7 +103,12 @@ export default function MyList() {
     setOpenDialog(true);
   };
 
-  const togglePopover = (id) => {
+  const togglePopover = (id, event) => {
+    const rect = event.currentTarget.getBoundingClientRect();
+    setPopoverPosition({
+      top: rect.bottom + window.scrollY + 6,
+      left: rect.left + window.scrollX,
+    });
     setActivePopoverId((prev) => (prev === id ? null : id));
   };
 
@@ -137,7 +145,10 @@ export default function MyList() {
         .toLowerCase()
         .includes(searchText.toLowerCase());
 
-      const categoryId = item.category?._id || item.category;
+      const categoryId =
+        item.category && typeof item.category === "object"
+          ? item.category._id
+          : item.category || "";
 
       const matchesCategory = selectedCategory
         ? categoryId === selectedCategory
@@ -150,13 +161,6 @@ export default function MyList() {
   const handleCategoryChange = (event) => {
     setSelectedCategory(event.target.value);
   };
-
-  const toggleRow = (id) =>
-    setSelection((current) =>
-      current.includes(id)
-        ? current.filter((item) => item !== id)
-        : [...current, id]
-    );
 
   useEffect(() => {
     async function fetchCategories() {
@@ -188,6 +192,16 @@ export default function MyList() {
   useEffect(() => {
     fetchWishlist();
   }, [fetchWishlist]);
+
+  useEffect(() => {
+    if (token) {
+      setIsReady(true);
+    }
+  }, [token]);
+
+  if (!isReady) {
+    return <p className="flex items-center">Carregando...</p>;
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -272,7 +286,7 @@ export default function MyList() {
               <select
                 id="category"
                 name="category"
-                value={selectedCategory}
+                value={formData.category}
                 onChange={handleCategoryChange}
                 className="w-full border border-brandsoftgray rounded-md py-2 px-3 text-sm text-brandsoftgray"
               >
@@ -302,7 +316,6 @@ export default function MyList() {
                 <thead className="bg-brandiceblue font-semibold text-black text-sm">
                   <tr>
                     <th className="py-3 px-4"></th>
-                    <th className="py-3 px-4"></th>
                     <th className="py-3 px-4 text-branddeepblue">Nome</th>
                     <th className="py-3 px-4 text-branddeepblue">Categoria</th>
                     <th className="py-3 px-4 text-branddeepblue">Episódios</th>
@@ -321,35 +334,48 @@ export default function MyList() {
                   ) : (
                     filteredRows.map((row) => (
                       <tr key={row._id}>
-                        <td className="py-3 px-4">
-                          <Checkbox
-                            checked={selection.includes(row._id)}
-                            onChange={() => toggleRow(row._id)}
-                          />
-                        </td>
                         <td className="py-2 px-4 text-center">
                           <div className="relative inline-block">
                             <NotePencil
                               size={25}
-                              onClick={() => togglePopover(row._id)}
+                              onClick={(e) => togglePopover(row._id, e)}
                               className="text-brandsteel cursor-pointer hover:text-brandprimary"
                             />
 
                             {activePopoverId === row._id && (
-                              <div className="absolute top-8 right-0 z-50 bg-brandsteel rounded-lg shadow-lg px-4 py-3 w-[140px] flex flex-col items-center gap-2">
-                                <div className="absolute -top-2 right-2 w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-b-[6px] border-b-brandsteel" />
+                              <div
+                                className="fixed z-[9999] bg-brandsteel rounded-lg shadow-lg mt-[10px] px-4 py-3 w-[140px] flex flex-col items-center gap-2"
+                                style={{
+                                  top: `${popoverPosition.y}px`,
+                                  left: `${popoverPosition.x}px`,
+                                }}
+                              >
+                                <div className="absolute -top-1 right-28 w-0 h-0 border-l-[10px] border-l-transparent border-r-[10px] border-r-transparent border-b-[5px] border-b-brandsteel" />
 
                                 <button
                                   className="w-full flex items-center gap-2 px-2 py-1 rounded bg-white text-brandsteel hover:opacity-90 transition"
                                   onClick={() => {
+                                    const categoryId =
+                                      row.category &&
+                                      typeof row.category === "object"
+                                        ? row.category._id
+                                        : row.category || "";
+
+                                    const isValidCategory = listCategories.some(
+                                      (cat) => cat._id === categoryId
+                                    );
+
                                     setFormData({
-                                      name: row.name || "",
-                                      imageUrl: row.imageUrl || "",
-                                      category: row.category.name || "",
+                                      name: row.name,
+                                      imageUrl: row.imageUrl,
+                                      category: isValidCategory
+                                        ? categoryId
+                                        : "",
                                       type: row.totalEp ? "assistir" : "ler",
                                       totalEp: row.totalEp || "",
                                       totalPag: row.totalPag || "",
                                     });
+
                                     setSelectedWishlist(row._id);
                                     setActivePopoverId(null);
                                     open();
@@ -379,7 +405,9 @@ export default function MyList() {
                           {row.name}
                         </td>
                         <td className="py-2 px-4 text-brandsteel text-center">
-                          {row.category?.name || "-"}
+                          {row.category && typeof row.category === "object"
+                            ? row.category.name
+                            : "-"}
                         </td>
 
                         <td className="py-2 px-4 text-brandsteel text-center">
