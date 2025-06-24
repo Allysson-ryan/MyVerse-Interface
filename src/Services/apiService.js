@@ -8,9 +8,9 @@ const api = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
+  withCredentials: true,
 });
 
-// ✅ Interceptor de requisição (envia token em todas as chamadas)
 api.interceptors.request.use((config) => {
   const token = getToken();
   if (token) {
@@ -19,7 +19,6 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// ✅ Interceptor de erro 401 (desloga com segurança)
 api.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -31,7 +30,6 @@ api.interceptors.response.use(
   }
 );
 
-// Função para criar resenha (sem precisar passar token)
 export const createReview = async (dados) => {
   try {
     const response = await api.post("/reviews", dados);
@@ -57,7 +55,6 @@ export const getLatestReviews = async () => {
   }
 };
 
-// Buscar resenha por ID
 export const getReviewById = async (id) => {
   try {
     const response = await api.get(`/reviews/${id}`);
@@ -67,7 +64,6 @@ export const getReviewById = async (id) => {
   }
 };
 
-// Atualizar resenha
 export const updateReview = async (id, dados) => {
   try {
     const response = await api.put(`/reviews/${id}`, dados);
@@ -79,7 +75,6 @@ export const updateReview = async (id, dados) => {
   }
 };
 
-// Deletar resenha
 export const deleteReview = async (id) => {
   try {
     const response = await api.delete(`/reviews/${id}`);
