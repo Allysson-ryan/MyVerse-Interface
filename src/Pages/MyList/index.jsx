@@ -137,8 +137,7 @@ export default function MyList() {
         .toLowerCase()
         .includes(searchText.toLowerCase());
 
-      const categoryId =
-        typeof item.category === "object" ? item.category._id : item.category;
+      const categoryId = item.category?._id || item.category;
 
       const matchesCategory = selectedCategory
         ? categoryId === selectedCategory
