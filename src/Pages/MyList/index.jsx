@@ -343,9 +343,9 @@ export default function MyList() {
                                   className="w-full flex items-center gap-2 px-2 py-1 rounded bg-white text-brandsteel hover:opacity-90 transition"
                                   onClick={() => {
                                     setFormData({
-                                      name: row.name,
-                                      imageUrl: row.imageUrl,
-                                      category: row.category.name,
+                                      name: row.name || "",
+                                      imageUrl: row.imageUrl || "",
+                                      category: row.category.name || "",
                                       type: row.totalEp ? "assistir" : "ler",
                                       totalEp: row.totalEp || "",
                                       totalPag: row.totalPag || "",
