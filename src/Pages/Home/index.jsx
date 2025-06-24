@@ -320,8 +320,12 @@ const Home = () => {
               key={item._id}
               className="max-sm:w-[13rem] max-sm:h-[16rem] sm:w-[14rem] sm:h-[18rem] flex items-center flex-col p-[10px] rounded-[10px] border-[1px] border-brandsoftgray"
             >
-              <div className="max-sm:w-[6rem] sm:w-[7rem]">
-                <img src={item.imageUrl} alt={item.name} className="w-full" />
+              <div className="max-sm:w-[6rem] max-sm:h-[8rem] sm:w-[7.5rem] sm:h-[10.5rem]">
+                <img
+                  src={item.imageUrl}
+                  alt={item.name}
+                  className="max-sm:w-full max-sm:h-full w-full h-full"
+                />
               </div>
 
               <div className="w-full h-full flex items-center justify-between flex-col mt-[10px]">
