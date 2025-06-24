@@ -318,7 +318,7 @@ const Home = () => {
           {wishlistItems.map((item) => (
             <div
               key={item._id}
-              className="max-sm:w-[13rem] max-sm:h-[16rem] sm:w-[14rem] sm:h-[17rem] flex items-center flex-col p-[10px] rounded-[10px] border-[1px] border-brandsoftgray"
+              className="max-sm:w-[13rem] max-sm:h-[16rem] sm:w-[14rem] sm:h-[18rem] flex items-center flex-col p-[10px] rounded-[10px] border-[1px] border-brandsoftgray"
             >
               <div className="max-sm:w-[6rem] sm:w-[7rem]">
                 <img src={item.imageUrl} alt={item.name} className="w-full" />
@@ -326,20 +326,30 @@ const Home = () => {
 
               <div className="w-full h-full flex items-center justify-between flex-col mt-[10px]">
                 <div className="w-full flex items-center justify-center">
-                  <SubTitle
-                    text={item.name}
-                    className="max-sm:text-[18px] sm:text-[19px] text-center"
-                  />
+                  <abbr title={item.name} className="no-underline w-full">
+                    <SubTitle
+                      text={item.name}
+                      className="max-sm:text-[16px] sm:text-[17px] text-center whitespace-nowrap overflow-hidden text-ellipsis block max-w-[150px]"
+                    />
+                  </abbr>
                 </div>
 
                 <div className="w-full flex items-center justify-between p-[10px]">
-                  <h1 className="max-sm:w-[25%] sm:w-[27%] bg-brandbabyblue text-[12px] rounded-[15px] px-[10px] py-[2px] text-center">
-                    {item.totalEp ? "Filme" : "Livro"}
+                  <h1
+                    className="max-sm:h-[20px] sm:h-[20px] bg-brandbabyblue text-[12px] rounded-[15px] p-[7px] 
+                      max-w-[100px] overflow-hidden whitespace-nowrap text-ellipsis flex items-center"
+                  >
+                    <abbr
+                      title={item.category?.name || ""}
+                      className="block w-full overflow-hidden text-ellipsis whitespace-nowrap no-underline"
+                    >
+                      {item.category?.name}
+                    </abbr>
                   </h1>
                   <h2 className="text-[13px]">
                     {item.totalEp
                       ? `Eps: ${item.totalEp}`
-                      : `Páginas: ${item.totalPag}`}
+                      : `Pági: ${item.totalPag}`}
                   </h2>
                 </div>
               </div>
@@ -348,7 +358,7 @@ const Home = () => {
 
           <button
             onClick={() => navigate("/minha-lista")}
-            className="max-sm:w-[13rem] max-sm:h-[16rem] sm:w-[14rem] sm:h-[17rem] flex items-center justify-center rounded-[10px] border-[1px] border-brandsoftgray cursor-pointer hover:bg-brandiceblue hover:border-0"
+            className="max-sm:w-[13rem] max-sm:h-[16rem] sm:w-[14rem] sm:h-[18rem]  flex items-center justify-center rounded-[10px] border-[1px] border-brandsoftgray cursor-pointer hover:bg-brandiceblue hover:border-0"
           >
             <p className="">Ver Tudo</p>
           </button>
