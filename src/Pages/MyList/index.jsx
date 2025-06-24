@@ -286,7 +286,7 @@ export default function MyList() {
               <select
                 id="category"
                 name="category"
-                value={formData.category}
+                value={selectedCategory}
                 onChange={handleCategoryChange}
                 className="w-full border border-brandsoftgray rounded-md py-2 px-3 text-sm text-brandsoftgray"
               >
