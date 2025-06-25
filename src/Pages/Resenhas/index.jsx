@@ -467,185 +467,191 @@ const ResenhasPage = () => {
           </Modal>
 
           {filteredReviews.length > 0 ? (
-            filteredReviews.map((review) => (
-              <div
-                key={review._id}
-                onClick={() => navigate("/detalhes", { state: { review } })}
-                className="cursor-pointer transition-transform duration-300 hover:scale-105 
+            filteredReviews
+              .slice()
+              .reverse()
+              .map((review) => (
+                <div
+                  key={review._id}
+                  onClick={() => navigate("/detalhes", { state: { review } })}
+                  className="cursor-pointer transition-transform duration-300 hover:scale-105 
                 max-sm:w-[100%] max-sm:min-h-[7rem] sm:w-[100%] sm:min-h-[8rem] 
                 bg-brandlightgray flex items-center justify-center 
                 max-sm:flex-col sm:flex-col md:flex-row pr-[10px] p-[10px] 
                 rounded-[10px] gap-[13px]"
-              >
-                <div className=" max-sm:w-[7rem] sm:w-[6rem] md:w-[7.5rem] mt-[10px] md:mt-0">
-                  <img
-                    src={review.imageUrl}
-                    alt={review.name}
-                    className="w-full rounded-[5px]"
-                  />
-                </div>
-                <div className="w-full h-full flex items-center justify-center flex-col pb-[10px]">
-                  <div className="w-full mt-[10px]">
-                    <div className="w-full flex items-center justify-between gap-[5px]">
-                      <abbr title={review.name} className="no-underline w-full">
-                        <SubTitle
-                          text={review.name}
-                          className="custom-subtitle-462px custom-subtitle-525px custom-subtitle-635px custom-subtitle-685px max-sm:text-[20px] sm:text-[18px] whitespace-nowrap overflow-hidden text-ellipsis block max-w-[150px]"
-                        />
-                      </abbr>
-
-                      <div className="relative">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            togglePopover(review._id);
-                          }}
+                >
+                  <div className=" max-sm:w-[7rem] sm:w-[6rem] md:w-[7.5rem] mt-[10px] md:mt-0">
+                    <img
+                      src={review.imageUrl}
+                      alt={review.name}
+                      className="w-full rounded-[5px]"
+                    />
+                  </div>
+                  <div className="w-full h-full flex items-center justify-center flex-col pb-[10px]">
+                    <div className="w-full mt-[10px]">
+                      <div className="w-full flex items-center justify-between gap-[5px]">
+                        <abbr
+                          title={review.name}
+                          className="no-underline w-full"
                         >
-                          <NotePencil
-                            size={18}
-                            className="hover:text-brandsteel custom-buttonEdit-462px custom-buttonEdit-525px custom-buttonEdit-635px max-sm:w-[25px] max-sm:h-[25px] md:w-[25px] md:h-[25px] cursor-pointer"
+                          <SubTitle
+                            text={review.name}
+                            className="custom-subtitle-462px custom-subtitle-525px custom-subtitle-635px custom-subtitle-685px max-sm:text-[20px] sm:text-[18px] whitespace-nowrap overflow-hidden text-ellipsis block max-w-[150px]"
                           />
-                        </button>
+                        </abbr>
 
-                        {activePopoverId === review._id && (
-                          <div className="absolute top-[120%] right-0 bg-brandsteel rounded-lg shadow-lg z-50 px-6 py-5 w-[140px] flex flex-col items-center gap-2">
-                            <div className="absolute -top-1.5 right-2 w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-b-[6px] border-b-brandsteel"></div>
+                        <div className="relative">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              togglePopover(review._id);
+                            }}
+                          >
+                            <NotePencil
+                              size={18}
+                              className="hover:text-brandsteel custom-buttonEdit-462px custom-buttonEdit-525px custom-buttonEdit-635px max-sm:w-[25px] max-sm:h-[25px] md:w-[25px] md:h-[25px] cursor-pointer"
+                            />
+                          </button>
 
-                            {/* Botão Editar */}
-                            <button
-                              className="w-full flex items-center gap-2 px-2 py-1 rounded bg-white text-brandsteel hover:opacity-90 transition mb-1"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                navigate("/adicionar-resenha", {
-                                  state: { review },
-                                });
-                                setActivePopoverId(null);
-                              }}
-                            >
-                              <PencilSimpleLine size={16} />
-                              <span className="text-xs font-semibold">
-                                Editar
-                              </span>
-                            </button>
+                          {activePopoverId === review._id && (
+                            <div className="absolute top-[120%] right-0 bg-brandsteel rounded-lg shadow-lg z-50 px-6 py-5 w-[140px] flex flex-col items-center gap-2">
+                              <div className="absolute -top-1.5 right-2 w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-b-[6px] border-b-brandsteel"></div>
 
-                            {/* Botão Apagar */}
-                            <button
-                              className="w-full flex items-center gap-2 px-2 py-1 rounded text-white hover:bg-[#5c6786] transition"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleClickDelete(review._id);
-                              }}
-                            >
-                              <TrashIcon size={16} />
-                              <span className="text-xs font-semibold">
-                                Apagar
-                              </span>
-                            </button>
-                          </div>
-                        )}
+                              {/* Botão Editar */}
+                              <button
+                                className="w-full flex items-center gap-2 px-2 py-1 rounded bg-white text-brandsteel hover:opacity-90 transition mb-1"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  navigate("/adicionar-resenha", {
+                                    state: { review },
+                                  });
+                                  setActivePopoverId(null);
+                                }}
+                              >
+                                <PencilSimpleLine size={16} />
+                                <span className="text-xs font-semibold">
+                                  Editar
+                                </span>
+                              </button>
+
+                              {/* Botão Apagar */}
+                              <button
+                                className="w-full flex items-center gap-2 px-2 py-1 rounded text-white hover:bg-[#5c6786] transition"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleClickDelete(review._id);
+                                }}
+                              >
+                                <TrashIcon size={16} />
+                                <span className="text-xs font-semibold">
+                                  Apagar
+                                </span>
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                        {/* Modal de confirmação */}
                       </div>
-                      {/* Modal de confirmação */}
+
+                      {review.startDate && (
+                        <h2 className="text-[11.5px] custom-h2-462px custom-h2-525px custom-h2-635px max-sm:text-[13px] sm:text-[12px] md:text-[13px]">
+                          {formatDateToBR(review.startDate)} -{" "}
+                          {review.endDate ? (
+                            formatDateToBR(review.endDate)
+                          ) : review.status === "Abandonei" ? (
+                            <span className="text-[12px] ">Sem Data</span>
+                          ) : null}
+                        </h2>
+                      )}
+
+                      <h2 className="custom-h2-462px custom-h2-525px custom-h2-635px max-sm:text-[13px] sm:text-[12px] md:text-[13px]">
+                        {review.totalPag
+                          ? `Páginas: ${review.consumed}/${review.totalPag}`
+                          : `Episódios: ${review.consumed}/${review.totalEp}`}
+                      </h2>
+                      <h2
+                        className={`${getStatusColorClass(
+                          review.status
+                        )} custom-status-462px custom-status-525px custom-status-635px max-sm:text-[14px] sm:text-[14px]`}
+                      >
+                        {review.status}
+                      </h2>
                     </div>
 
-                    {review.startDate && (
-                      <h2 className="text-[11.5px] custom-h2-462px custom-h2-525px custom-h2-635px max-sm:text-[13px] sm:text-[12px] md:text-[13px]">
-                        {formatDateToBR(review.startDate)} -{" "}
-                        {review.endDate ? (
-                          formatDateToBR(review.endDate)
-                        ) : review.status === "Abandonei" ? (
-                          <span className="text-[12px] ">Sem Data</span>
-                        ) : null}
-                      </h2>
-                    )}
-
-                    <h2 className="custom-h2-462px custom-h2-525px custom-h2-635px max-sm:text-[13px] sm:text-[12px] md:text-[13px]">
-                      {review.totalPag
-                        ? `Páginas: ${review.consumed}/${review.totalPag}`
-                        : `Episódios: ${review.consumed}/${review.totalEp}`}
-                    </h2>
-                    <h2
-                      className={`${getStatusColorClass(
-                        review.status
-                      )} custom-status-462px custom-status-525px custom-status-635px max-sm:text-[14px] sm:text-[14px]`}
-                    >
-                      {review.status}
-                    </h2>
-                  </div>
-
-                  <div className="custom-div-462px max-sm:flex-col-reverse sm:flex-col-reverse md:flex-row w-full h-full flex items-center justify-between pt-[10px] mt-[10px] gap-[10px]">
-                    <div className="flex items-center gap-[5px]">
-                      <Stack spacing={1}>
-                        <Rating
-                          name={`rating-${review._id}`}
-                          value={review.rating}
-                          precision={0.5}
-                          readOnly
-                        />
-                      </Stack>
-                      {review.favorite && (
+                    <div className="custom-div-462px max-sm:flex-col-reverse sm:flex-col-reverse md:flex-row w-full h-full flex items-center justify-between pt-[10px] mt-[10px] gap-[10px]">
+                      <div className="flex items-center gap-[5px]">
                         <Stack spacing={1}>
                           <Rating
-                            name={`favorite-${review._id}`}
-                            value={1}
-                            max={1}
+                            name={`rating-${review._id}`}
+                            value={review.rating}
+                            precision={0.5}
                             readOnly
-                            icon={<FavoriteIcon fontSize="inherit" />}
-                            sx={{
-                              "& .MuiRating-iconFilled": {
-                                color: "#f44336",
-                              },
-                            }}
                           />
                         </Stack>
-                      )}
-                    </div>
-                    <h1
-                      className="max-sm:h-[20px] sm:h-[20px] bg-brandbabyblue text-[12px] rounded-[15px] p-[7px] 
+                        {review.favorite && (
+                          <Stack spacing={1}>
+                            <Rating
+                              name={`favorite-${review._id}`}
+                              value={1}
+                              max={1}
+                              readOnly
+                              icon={<FavoriteIcon fontSize="inherit" />}
+                              sx={{
+                                "& .MuiRating-iconFilled": {
+                                  color: "#f44336",
+                                },
+                              }}
+                            />
+                          </Stack>
+                        )}
+                      </div>
+                      <h1
+                        className="max-sm:h-[20px] sm:h-[20px] bg-brandbabyblue text-[12px] rounded-[15px] p-[7px] 
                       max-w-[100px] overflow-hidden whitespace-nowrap text-ellipsis flex items-center"
-                    >
-                      <abbr
-                        title={review.category?.name || ""}
-                        className="block w-full overflow-hidden text-ellipsis whitespace-nowrap no-underline"
                       >
-                        {review.category?.name}
-                      </abbr>
-                    </h1>
+                        <abbr
+                          title={review.category?.name || ""}
+                          className="block w-full overflow-hidden text-ellipsis whitespace-nowrap no-underline"
+                        >
+                          {review.category?.name}
+                        </abbr>
+                      </h1>
+                    </div>
+                    {openDialog && (
+                      <Dialog open={openDialog} onClose={handleCloseDialog}>
+                        <DialogTitle>Confirmar exclusão</DialogTitle>
+                        <DialogContent>
+                          <DialogContentText>
+                            Tem certeza que deseja excluir esta resenha? Essa
+                            ação não pode ser desfeita.
+                          </DialogContentText>
+                        </DialogContent>
+                        <DialogActions>
+                          <Button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleCloseDialog();
+                            }}
+                            color="primary"
+                          >
+                            Cancelar
+                          </Button>
+                          <Button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleConfirmDelete();
+                            }}
+                            color="error"
+                            variant="contained"
+                          >
+                            Excluir
+                          </Button>
+                        </DialogActions>
+                      </Dialog>
+                    )}
                   </div>
-                  {openDialog && (
-                    <Dialog open={openDialog} onClose={handleCloseDialog}>
-                      <DialogTitle>Confirmar exclusão</DialogTitle>
-                      <DialogContent>
-                        <DialogContentText>
-                          Tem certeza que deseja excluir esta resenha? Essa ação
-                          não pode ser desfeita.
-                        </DialogContentText>
-                      </DialogContent>
-                      <DialogActions>
-                        <Button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleCloseDialog();
-                          }}
-                          color="primary"
-                        >
-                          Cancelar
-                        </Button>
-                        <Button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleConfirmDelete();
-                          }}
-                          color="error"
-                          variant="contained"
-                        >
-                          Excluir
-                        </Button>
-                      </DialogActions>
-                    </Dialog>
-                  )}
                 </div>
-              </div>
-            ))
+              ))
           ) : (
             <p className="text-lg text-brandsteel font-bold text-center w-full mt-3 ml-5">
               Nenhuma resenha encontrada
