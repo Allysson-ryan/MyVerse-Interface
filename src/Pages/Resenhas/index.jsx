@@ -1,6 +1,11 @@
 import { StackPlusIcon, TrashIcon } from "@phosphor-icons/react";
 import CustomCarousel from "../../components/CustomCarousel";
-import { FunnelSimple, NotePencil, PencilSimpleLine } from "phosphor-react";
+import {
+  FunnelSimple,
+  MagnifyingGlass,
+  NotePencil,
+  PencilSimpleLine,
+} from "phosphor-react";
 import { useCallback, useEffect, useState } from "react";
 import SubTitle from "../../components/SubTitle";
 import Rating from "@mui/material/Rating";
