@@ -160,7 +160,10 @@ const ResenhasPage = () => {
       const errorMessage =
         error.response?.data?.message ||
         "Erro ao carregar métricas das resenhas.";
+
       openSnackbar(errorMessage, "error");
+    } finally {
+      setLoading(false);
     }
   }, []);
 
