@@ -531,15 +531,13 @@ const ResenhasPage = () => {
           {filteredReviews.length > 0 ? (
             years.map((year) => (
               <div key={year} className="col-span-full">
-                <div className="mb-6">
-                  <h2 className="text-[32px] font-bold text-branddeepblue">
+                <div className="mb-3">
+                  <h2 className="ml-2 text-[32px] font-bold text-branddeepblue">
                     {year}
                   </h2>
-
-                  <div className="w-full h-[1px] bg-[#d9d9d9] mt-2"></div>
                 </div>
 
-                <div className="grid max-sm:grid-cols-2 sm:grid-cols-3 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-[10px] mb-12">
+                <div className="px-5 grid max-sm:grid-cols-2 sm:grid-cols-3 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-[10px] mb-12">
                   {groupedReviews[year]
                     .slice()
                     .reverse()
