@@ -537,7 +537,7 @@ const ResenhasPage = () => {
                   </h2>
                 </div>
 
-                <div className="px-5 grid max-sm:grid-cols-2 sm:grid-cols-3 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-[10px] mb-12">
+                <div className="mas-sm:px-0 sm:px-0 md:px-0 lg:px-5 xl:px-5 grid max-sm:grid-cols-2 sm:grid-cols-3 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-[10px] mb-12">
                   {groupedReviews[year]
                     .slice()
                     .reverse()
