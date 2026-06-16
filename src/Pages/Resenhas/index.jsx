@@ -55,6 +55,8 @@ const ResenhasPage = () => {
   const [activePopoverId, setActivePopoverId] = useState(null);
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedReviewId, setSelectedReviewId] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [loading, setLoading] = useState(true);
 
   const handleClickDelete = (id) => {
     setSelectedReviewId(id);
@@ -87,12 +89,13 @@ const ResenhasPage = () => {
     { title: "Favoritos", value: metrics.favoritos },
   ];
 
-  const temFiltros = categoria || status || nota;
+  const temFiltros = categoria || status || nota || searchTerm;
 
   const resetarFiltros = () => {
     setCategoria("");
     setStatus("");
     setNota("");
+    setSearchTerm("");
   };
 
   const openSnackbar = (message, severity = "success") => {
@@ -141,6 +144,7 @@ const ResenhasPage = () => {
 
   const fetchReviews = useCallback(async () => {
     try {
+      setLoading(true);
       const data = await listReviews();
       setReviews(data);
 
@@ -170,7 +174,7 @@ const ResenhasPage = () => {
 
       if (categoria) {
         resultado = resultado.filter(
-          (review) => review.category?._id === categoria
+          (review) => review.category?._id === categoria,
         );
       }
 
@@ -179,13 +183,13 @@ const ResenhasPage = () => {
           status === "lendo"
             ? "Consumindo"
             : status === "finalizado"
-            ? "Finalizado"
-            : status === "abandonado"
-            ? "Abandonei"
-            : "";
+              ? "Finalizado"
+              : status === "abandonado"
+                ? "Abandonei"
+                : "";
 
         resultado = resultado.filter(
-          (review) => review.status === statusNormalizado
+          (review) => review.status === statusNormalizado,
         );
       }
 
@@ -194,16 +198,22 @@ const ResenhasPage = () => {
           resultado = resultado.filter((review) => review.favorite === true);
         } else {
           resultado = resultado.filter(
-            (review) => Number(review.rating) === Number(nota)
+            (review) => Number(review.rating) === Number(nota),
           );
         }
+      }
+
+      if (searchTerm.trim().length >= 3) {
+        resultado = resultado.filter((review) =>
+          review.name?.toLowerCase().includes(searchTerm.trim().toLowerCase()),
+        );
       }
 
       setFilteredReviews(resultado);
     }
 
     aplicarFiltros();
-  }, [categoria, status, nota, reviews]);
+  }, [categoria, status, nota, reviews, searchTerm]);
 
   const handleSubmitCategoria = async (e) => {
     e.preventDefault();
@@ -257,6 +267,35 @@ const ResenhasPage = () => {
     setOpenDialog(false);
     setSelectedReviewId(null);
   };
+
+  if (loading) {
+    return (
+      <section className="flex justify-center items-center py-20">
+        <div className="flex flex-col items-center gap-4">
+          <span className="loading loading-spinner loading-lg"></span>
+          <p className="text-brandsteel">Carregando suas resenhas...</p>
+        </div>
+      </section>
+    );
+  }
+
+  const groupedReviews = filteredReviews.reduce((acc, review) => {
+    if (!review.startDate) return acc;
+
+    const year = new Date(review.startDate).getFullYear();
+
+    if (!acc[year]) {
+      acc[year] = [];
+    }
+
+    acc[year].push(review);
+
+    return acc;
+  }, {});
+
+  const years = Object.keys(groupedReviews).sort(
+    (a, b) => Number(b) - Number(a),
+  );
 
   return (
     <>
@@ -366,6 +405,21 @@ const ResenhasPage = () => {
                 <option value="5">5 Estrelas</option>
                 <option value="favorito">❤️ Favoritos</option>
               </select>
+
+              <div className="relative">
+                <MagnifyingGlass
+                  size={18}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-brandsoftgray"
+                />
+
+                <input
+                  type="text"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  placeholder="Pesquisar obra"
+                  className="pl-10 pr-4 py-1 border border-brandsoftgray rounded-full text-sm text-black focus:outline-none w-[220px]"
+                />
+              </div>
             </div>
           </div>
 
@@ -467,191 +521,210 @@ const ResenhasPage = () => {
           </Modal>
 
           {filteredReviews.length > 0 ? (
-            filteredReviews
-              .slice()
-              .reverse()
-              .map((review) => (
-                <div
-                  key={review._id}
-                  onClick={() => navigate("/detalhes", { state: { review } })}
-                  className="cursor-pointer transition-transform duration-300 hover:scale-105 
+            years.map((year) => (
+              <div key={year} className="col-span-full">
+                <div className="mb-6">
+                  <h2 className="text-[32px] font-bold text-branddeepblue">
+                    {year}
+                  </h2>
+
+                  <div className="w-full h-[1px] bg-[#d9d9d9] mt-2"></div>
+                </div>
+
+                <div className="grid max-sm:grid-cols-2 sm:grid-cols-3 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-[10px] mb-12">
+                  {groupedReviews[year]
+                    .slice()
+                    .reverse()
+                    .map((review) => (
+                      <div
+                        key={review._id}
+                        onClick={() =>
+                          navigate("/detalhes", { state: { review } })
+                        }
+                        className="cursor-pointer transition-transform duration-300 hover:scale-105 
                 max-sm:w-[100%] max-sm:min-h-[7rem] sm:w-[100%] sm:min-h-[8rem] 
                 bg-brandlightgray flex items-center justify-center 
                 max-sm:flex-col sm:flex-col md:flex-row pr-[10px] p-[10px] 
                 rounded-[10px] gap-[13px]"
-                >
-                  <div className=" max-sm:w-[7rem] sm:w-[6rem] md:w-[7.5rem] mt-[10px] md:mt-0">
-                    <img
-                      src={review.imageUrl}
-                      alt={review.name}
-                      className="w-full rounded-[5px]"
-                    />
-                  </div>
-                  <div className="w-full h-full flex items-center justify-center flex-col pb-[10px]">
-                    <div className="w-full mt-[10px]">
-                      <div className="w-full flex items-center justify-between gap-[5px]">
-                        <abbr
-                          title={review.name}
-                          className="no-underline w-full"
-                        >
-                          <SubTitle
-                            text={review.name}
-                            className="custom-subtitle-462px custom-subtitle-525px custom-subtitle-635px custom-subtitle-685px max-sm:text-[20px] sm:text-[18px] whitespace-nowrap overflow-hidden text-ellipsis block max-w-[150px]"
+                      >
+                        <div className=" max-sm:w-[7rem] sm:w-[6rem] md:w-[7.5rem] mt-[10px] md:mt-0">
+                          <img
+                            src={review.imageUrl}
+                            alt={review.name}
+                            className="w-full rounded-[5px]"
                           />
-                        </abbr>
-
-                        <div className="relative">
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              togglePopover(review._id);
-                            }}
-                          >
-                            <NotePencil
-                              size={18}
-                              className="hover:text-brandsteel custom-buttonEdit-462px custom-buttonEdit-525px custom-buttonEdit-635px max-sm:w-[25px] max-sm:h-[25px] md:w-[25px] md:h-[25px] cursor-pointer"
-                            />
-                          </button>
-
-                          {activePopoverId === review._id && (
-                            <div className="absolute top-[120%] right-0 bg-brandsteel rounded-lg shadow-lg z-50 px-6 py-5 w-[140px] flex flex-col items-center gap-2">
-                              <div className="absolute -top-1.5 right-2 w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-b-[6px] border-b-brandsteel"></div>
-
-                              {/* Botão Editar */}
-                              <button
-                                className="w-full flex items-center gap-2 px-2 py-1 rounded bg-white text-brandsteel hover:opacity-90 transition mb-1"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  navigate("/adicionar-resenha", {
-                                    state: { review },
-                                  });
-                                  setActivePopoverId(null);
-                                }}
+                        </div>
+                        <div className="w-full h-full flex items-center justify-center flex-col pb-[10px]">
+                          <div className="w-full mt-[10px]">
+                            <div className="w-full flex items-center justify-between gap-[5px]">
+                              <abbr
+                                title={review.name}
+                                className="no-underline w-full"
                               >
-                                <PencilSimpleLine size={16} />
-                                <span className="text-xs font-semibold">
-                                  Editar
-                                </span>
-                              </button>
+                                <SubTitle
+                                  text={review.name}
+                                  className="custom-subtitle-462px custom-subtitle-525px custom-subtitle-635px custom-subtitle-685px max-sm:text-[20px] sm:text-[18px] whitespace-nowrap overflow-hidden text-ellipsis block max-w-[150px]"
+                                />
+                              </abbr>
 
-                              {/* Botão Apagar */}
-                              <button
-                                className="w-full flex items-center gap-2 px-2 py-1 rounded text-white hover:bg-[#5c6786] transition"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleClickDelete(review._id);
-                                }}
-                              >
-                                <TrashIcon size={16} />
-                                <span className="text-xs font-semibold">
-                                  Apagar
-                                </span>
-                              </button>
+                              <div className="relative">
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    togglePopover(review._id);
+                                  }}
+                                >
+                                  <NotePencil
+                                    size={18}
+                                    className="hover:text-brandsteel custom-buttonEdit-462px custom-buttonEdit-525px custom-buttonEdit-635px max-sm:w-[25px] max-sm:h-[25px] md:w-[25px] md:h-[25px] cursor-pointer"
+                                  />
+                                </button>
+
+                                {activePopoverId === review._id && (
+                                  <div className="absolute top-[120%] right-0 bg-brandsteel rounded-lg shadow-lg z-50 px-6 py-5 w-[140px] flex flex-col items-center gap-2">
+                                    <div className="absolute -top-1.5 right-2 w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-b-[6px] border-b-brandsteel"></div>
+
+                                    {/* Botão Editar */}
+                                    <button
+                                      className="w-full flex items-center gap-2 px-2 py-1 rounded bg-white text-brandsteel hover:opacity-90 transition mb-1"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        navigate("/adicionar-resenha", {
+                                          state: { review },
+                                        });
+                                        setActivePopoverId(null);
+                                      }}
+                                    >
+                                      <PencilSimpleLine size={16} />
+                                      <span className="text-xs font-semibold">
+                                        Editar
+                                      </span>
+                                    </button>
+
+                                    {/* Botão Apagar */}
+                                    <button
+                                      className="w-full flex items-center gap-2 px-2 py-1 rounded text-white hover:bg-[#5c6786] transition"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleClickDelete(review._id);
+                                      }}
+                                    >
+                                      <TrashIcon size={16} />
+                                      <span className="text-xs font-semibold">
+                                        Apagar
+                                      </span>
+                                    </button>
+                                  </div>
+                                )}
+                              </div>
+                              {/* Modal de confirmação */}
                             </div>
+
+                            {review.startDate && (
+                              <h2 className="text-[11.5px] custom-h2-462px custom-h2-525px custom-h2-635px max-sm:text-[13px] sm:text-[12px] md:text-[13px]">
+                                {formatDateToBR(review.startDate)} -{" "}
+                                {review.endDate ? (
+                                  formatDateToBR(review.endDate)
+                                ) : review.status === "Abandonei" ? (
+                                  <span className="text-[12px] ">Sem Data</span>
+                                ) : null}
+                              </h2>
+                            )}
+
+                            <h2 className="custom-h2-462px custom-h2-525px custom-h2-635px max-sm:text-[13px] sm:text-[12px] md:text-[13px]">
+                              {review.totalPag
+                                ? `Páginas: ${review.consumed}/${review.totalPag}`
+                                : `Episódios: ${review.consumed}/${review.totalEp}`}
+                            </h2>
+                            <h2
+                              className={`${getStatusColorClass(
+                                review.status,
+                              )} custom-status-462px custom-status-525px custom-status-635px max-sm:text-[14px] sm:text-[14px]`}
+                            >
+                              {review.status}
+                            </h2>
+                          </div>
+
+                          <div className="custom-div-462px max-sm:flex-col-reverse sm:flex-col-reverse md:flex-row w-full h-full flex items-center justify-between pt-[10px] mt-[10px] gap-[10px]">
+                            <div className="flex items-center gap-[5px]">
+                              <Stack spacing={1}>
+                                <Rating
+                                  name={`rating-${review._id}`}
+                                  value={review.rating}
+                                  precision={0.5}
+                                  readOnly
+                                />
+                              </Stack>
+                              {review.favorite && (
+                                <Stack spacing={1}>
+                                  <Rating
+                                    name={`favorite-${review._id}`}
+                                    value={1}
+                                    max={1}
+                                    readOnly
+                                    icon={<FavoriteIcon fontSize="inherit" />}
+                                    sx={{
+                                      "& .MuiRating-iconFilled": {
+                                        color: "#f44336",
+                                      },
+                                    }}
+                                  />
+                                </Stack>
+                              )}
+                            </div>
+                            <h1
+                              className="max-sm:h-[20px] sm:h-[20px] bg-brandbabyblue text-[12px] rounded-[15px] p-[7px] 
+                      max-w-[100px] overflow-hidden whitespace-nowrap text-ellipsis flex items-center"
+                            >
+                              <abbr
+                                title={review.category?.name || ""}
+                                className="block w-full overflow-hidden text-ellipsis whitespace-nowrap no-underline"
+                              >
+                                {review.category?.name}
+                              </abbr>
+                            </h1>
+                          </div>
+                          {openDialog && (
+                            <Dialog
+                              open={openDialog}
+                              onClose={handleCloseDialog}
+                            >
+                              <DialogTitle>Confirmar exclusão</DialogTitle>
+                              <DialogContent>
+                                <DialogContentText>
+                                  Tem certeza que deseja excluir esta resenha?
+                                  Essa ação não pode ser desfeita.
+                                </DialogContentText>
+                              </DialogContent>
+                              <DialogActions>
+                                <Button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleCloseDialog();
+                                  }}
+                                  color="primary"
+                                >
+                                  Cancelar
+                                </Button>
+                                <Button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleConfirmDelete();
+                                  }}
+                                  color="error"
+                                  variant="contained"
+                                >
+                                  Excluir
+                                </Button>
+                              </DialogActions>
+                            </Dialog>
                           )}
                         </div>
-                        {/* Modal de confirmação */}
                       </div>
-
-                      {review.startDate && (
-                        <h2 className="text-[11.5px] custom-h2-462px custom-h2-525px custom-h2-635px max-sm:text-[13px] sm:text-[12px] md:text-[13px]">
-                          {formatDateToBR(review.startDate)} -{" "}
-                          {review.endDate ? (
-                            formatDateToBR(review.endDate)
-                          ) : review.status === "Abandonei" ? (
-                            <span className="text-[12px] ">Sem Data</span>
-                          ) : null}
-                        </h2>
-                      )}
-
-                      <h2 className="custom-h2-462px custom-h2-525px custom-h2-635px max-sm:text-[13px] sm:text-[12px] md:text-[13px]">
-                        {review.totalPag
-                          ? `Páginas: ${review.consumed}/${review.totalPag}`
-                          : `Episódios: ${review.consumed}/${review.totalEp}`}
-                      </h2>
-                      <h2
-                        className={`${getStatusColorClass(
-                          review.status
-                        )} custom-status-462px custom-status-525px custom-status-635px max-sm:text-[14px] sm:text-[14px]`}
-                      >
-                        {review.status}
-                      </h2>
-                    </div>
-
-                    <div className="custom-div-462px max-sm:flex-col-reverse sm:flex-col-reverse md:flex-row w-full h-full flex items-center justify-between pt-[10px] mt-[10px] gap-[10px]">
-                      <div className="flex items-center gap-[5px]">
-                        <Stack spacing={1}>
-                          <Rating
-                            name={`rating-${review._id}`}
-                            value={review.rating}
-                            precision={0.5}
-                            readOnly
-                          />
-                        </Stack>
-                        {review.favorite && (
-                          <Stack spacing={1}>
-                            <Rating
-                              name={`favorite-${review._id}`}
-                              value={1}
-                              max={1}
-                              readOnly
-                              icon={<FavoriteIcon fontSize="inherit" />}
-                              sx={{
-                                "& .MuiRating-iconFilled": {
-                                  color: "#f44336",
-                                },
-                              }}
-                            />
-                          </Stack>
-                        )}
-                      </div>
-                      <h1
-                        className="max-sm:h-[20px] sm:h-[20px] bg-brandbabyblue text-[12px] rounded-[15px] p-[7px] 
-                      max-w-[100px] overflow-hidden whitespace-nowrap text-ellipsis flex items-center"
-                      >
-                        <abbr
-                          title={review.category?.name || ""}
-                          className="block w-full overflow-hidden text-ellipsis whitespace-nowrap no-underline"
-                        >
-                          {review.category?.name}
-                        </abbr>
-                      </h1>
-                    </div>
-                    {openDialog && (
-                      <Dialog open={openDialog} onClose={handleCloseDialog}>
-                        <DialogTitle>Confirmar exclusão</DialogTitle>
-                        <DialogContent>
-                          <DialogContentText>
-                            Tem certeza que deseja excluir esta resenha? Essa
-                            ação não pode ser desfeita.
-                          </DialogContentText>
-                        </DialogContent>
-                        <DialogActions>
-                          <Button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleCloseDialog();
-                            }}
-                            color="primary"
-                          >
-                            Cancelar
-                          </Button>
-                          <Button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleConfirmDelete();
-                            }}
-                            color="error"
-                            variant="contained"
-                          >
-                            Excluir
-                          </Button>
-                        </DialogActions>
-                      </Dialog>
-                    )}
-                  </div>
+                    ))}
                 </div>
-              ))
+              </div>
+            ))
           ) : (
             <p className="text-lg text-brandsteel font-bold text-center w-full mt-3 ml-5">
               Nenhuma resenha encontrada
